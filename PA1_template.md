@@ -47,7 +47,8 @@ dataset.
 
 Loading Libraries
 
-```{r}
+
+```r
 library(dplyr)
 library(ggplot2)
 library(knitr)
@@ -55,24 +56,42 @@ library(knitr)
 
 Set options on RMarkdown
 
-```{r}
+
+```r
 opts_chunk$set(echo=TRUE)
 ```
 
 Set enrironment to English for Days of the Week.
 
-```{r}
+
+```r
 Sys.setlocale("LC_TIME", "English")
+```
+
+```
+## [1] "English_United States.1252"
 ```
 
 ### Loading and preprocessing the data
 
 1. Load the data
 
-```{r}
+
+```r
 unzip("activity.zip")
 activity <- read.csv("activity.csv")
 summary(activity)
+```
+
+```
+##      steps                date          interval     
+##  Min.   :  0.00   2012-10-01:  288   Min.   :   0.0  
+##  1st Qu.:  0.00   2012-10-02:  288   1st Qu.: 588.8  
+##  Median :  0.00   2012-10-03:  288   Median :1177.5  
+##  Mean   : 37.38   2012-10-04:  288   Mean   :1177.5  
+##  3rd Qu.: 12.00   2012-10-05:  288   3rd Qu.:1766.2  
+##  Max.   :806.00   2012-10-06:  288   Max.   :2355.0  
+##  NA's   :2304     (Other)   :15840
 ```
 
 2. Process/transform the data (if necessary) into a format suitable for your analysis
@@ -86,19 +105,34 @@ the dataset.
 
 1. Make a histogram of the total number of steps taken each day
 
-```{r}
+
+```r
 group_date <- tapply(activity$step, activity$date, sum)
 qplot(group_date, geom="histogram", binwidth=1060, xlab="Daily Total Steps", 
       main="Total Number of Steps taken each day", ylab="Frecuency")
 ```
 
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
+
 2. Calculate and report the **mean** and **median** total number of steps taken per day
 
-```{r}
+
+```r
 mean_steps <- mean(group_date, na.rm=TRUE)
 mean_steps
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median_steps <- median(group_date, na.rm=TRUE)
 median_steps
+```
+
+```
+## [1] 10765
 ```
 
 
@@ -106,17 +140,26 @@ median_steps
 
 1. Make a time series plot (i.e. `type = "l"`) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 
-```{r}
+
+```r
 averagePerInterval <- aggregate(x = list(steps = activity$steps), by = list(interval = activity$interval), 
     FUN = mean, na.rm = TRUE)
 ggplot(data = averagePerInterval, aes(x = interval, y = steps)) + geom_line(colour = "blue") + 
     xlab("5-minute Interval") + ylab("Average steps") + ggtitle("Average Steps in 5-minute interval")
 ```
 
+![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png) 
+
 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
-```{r}
+
+```r
 averagePerInterval[which.max(averagePerInterval$steps), ]
+```
+
+```
+##     interval    steps
+## 104      835 206.1698
 ```
 
 The 835 interval in average, is the most active time with 206 steps.
@@ -129,15 +172,28 @@ bias into some calculations or summaries of the data.
 
 1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with `NA`s)
 
-```{r}
+
+```r
 summary(activity)
+```
+
+```
+##      steps                date          interval     
+##  Min.   :  0.00   2012-10-01:  288   Min.   :   0.0  
+##  1st Qu.:  0.00   2012-10-02:  288   1st Qu.: 588.8  
+##  Median :  0.00   2012-10-03:  288   Median :1177.5  
+##  Mean   : 37.38   2012-10-04:  288   Mean   :1177.5  
+##  3rd Qu.: 12.00   2012-10-05:  288   3rd Qu.:1766.2  
+##  Max.   :806.00   2012-10-06:  288   Max.   :2355.0  
+##  NA's   :2304     (Other)   :15840
 ```
 
 We have 2304 observations (rows) without data (NA).
 
 2. We can use the mean for the 5-minute interval to fill NA values on steps variable.
 
-```{r}
+
+```r
 activity2 <- activity
 for (i in 1:nrow(activity2)) {
     if (is.na(activity2$steps[i])) { 
@@ -148,20 +204,49 @@ for (i in 1:nrow(activity2)) {
 
 3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
-```{r}
+
+```r
 summary(activity2)
+```
+
+```
+##      steps                date          interval     
+##  Min.   :  0.00   2012-10-01:  288   Min.   :   0.0  
+##  1st Qu.:  0.00   2012-10-02:  288   1st Qu.: 588.8  
+##  Median :  0.00   2012-10-03:  288   Median :1177.5  
+##  Mean   : 37.38   2012-10-04:  288   Mean   :1177.5  
+##  3rd Qu.: 27.00   2012-10-05:  288   3rd Qu.:1766.2  
+##  Max.   :806.00   2012-10-06:  288   Max.   :2355.0  
+##                   (Other)   :15840
 ```
 
 4. Make a histogram of the total number of steps taken each day and Calculate and report the **mean** and **median** total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
-```{r}
+
+```r
 group_date2 <- tapply(activity2$step, activity2$date, sum)
 qplot(group_date2, geom="histogram", binwidth=1060, xlab="Daily Total Steps", 
       main="Total Number of Steps taken each day", ylab="Frecuency")
+```
+
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png) 
+
+```r
 mean_steps2 <- mean(group_date2)
 mean_steps2
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median_steps2 <- median(group_date2)
 median_steps2
+```
+
+```
+## [1] 10766.19
 ```
 
 We can see that mean remains the same, because we use the averages on the imputting missing task. But, the Histogram changed with a higher value on the mean, because we have more data with the mean value.
@@ -173,14 +258,16 @@ the dataset with the filled-in missing values for this part.
 
 1. Create a new factor variable in the dataset with two levels -- "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
 
-```{r}
+
+```r
 activity2$date <- as.Date(activity2$date)
 activity2$WeekDay<-ifelse((weekdays(activity2$date) %in% c("Saturday","Sunday")), "weekend","weekday")
 ```
 
 2. Make a panel plot containing a time series plot (i.e. `type = "l"`) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). 
 
-```{r}
+
+```r
 activityByInterval<-group_by(activity2,WeekDay,interval)
 meanWeekDay<-activity2 %>% group_by(WeekDay,interval) %>% summarize(mean_steps=mean(steps))
 ggplot(meanWeekDay, aes(x=interval, y=mean_steps)) + 
@@ -189,3 +276,5 @@ ggplot(meanWeekDay, aes(x=interval, y=mean_steps)) +
   theme(strip.background = element_rect(fill = "navajowhite"), panel.grid.major = element_blank(), 
   panel.grid.minor = element_blank())
 ```
+
+![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-1.png) 
